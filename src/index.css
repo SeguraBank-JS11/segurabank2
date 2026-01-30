@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@theme {
+  /* Definindo a cor do SeguraBank de um jeito que o Tailwind v4 entenda */
+  --color-bank-blue: #1e3a8a;
+  --color-bank-green: #10b981;
+}
