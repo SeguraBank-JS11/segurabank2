@@ -2,7 +2,7 @@ import { useContext, useEffect, useState, type ChangeEvent, type FormEvent } fro
 import { useNavigate, useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { AuthContext } from "../../../contexts/AuthContext";
-import type Tema from "../../../models/Categoria";
+import type Categoria from "../../../models/Categoria";
 import { atualizar, buscar, cadastrar } from "../../../services/Service";
 import { ToastAlerta } from "../../../utils/ToastAlerta";
 
@@ -10,7 +10,7 @@ function FormTema() {
 
     const navigate = useNavigate();
 
-    const [tema, setTema] = useState<Tema>({} as Tema)
+    const [tema, setTema] = useState<Categoria>({} as Categoria)
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
 

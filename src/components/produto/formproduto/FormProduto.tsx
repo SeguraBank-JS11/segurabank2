@@ -26,7 +26,7 @@ function FormPostagem() {
 
     async function buscarPostagemPorId(id: string) {
         try {
-            await buscar(`/postagens/${id}`, setPostagem, {
+            await buscar(`/produtos/${id}`, setPostagem, {
                 headers: { Authorization: token }
             })
         } catch (error: any) {
@@ -92,7 +92,7 @@ function FormPostagem() {
     }
 
     function retornar() {
-        navigate('/postagens');
+        navigate('/produtos');
     }
 
     async function gerarNovaPostagem(e: FormEvent<HTMLFormElement>) {
@@ -101,7 +101,7 @@ function FormPostagem() {
 
         if (id !== undefined) {
             try {
-                await atualizar(`/postagens`, postagem, setPostagem, {
+                await atualizar(`/produtos`, postagem, setPostagem, {
                     headers: {
                         Authorization: token,
                     },
@@ -119,7 +119,7 @@ function FormPostagem() {
 
         } else {
             try {
-                await cadastrar(`/postagens`, postagem, setPostagem, {
+                await cadastrar(`/produtos`, postagem, setPostagem, {
                     headers: {
                         Authorization: token,
                     },

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import type Tema from '../../../models/Categoria'
+import type Categoria from '../../../models/Categoria'
 
 interface CardTemaProps{
     tema: Tema

@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Shield, Target, Sparkles } from "lucide-react";
-import logo from "../assets/LOGO_SEGURABANK1.png";
+import logo from "../../assets/LOGO_SEGURABANK1.png";
 
 type Produto = {
   titulo: string;

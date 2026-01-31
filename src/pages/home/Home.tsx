@@ -1,7 +1,7 @@
 import { ArrowRight, Heart, Shield, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 // Importando a imagem que você salvou (ajuste o nome se necessário)
-import familyImage from '../assets/familia-segura.png'; 
+import familyImage from '../../assets/familia-segura.png'; 
 
 const Home = () => {
   return (

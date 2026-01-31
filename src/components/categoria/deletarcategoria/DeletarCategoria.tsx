@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { ClipLoader } from "react-spinners"
 import { AuthContext } from "../../../contexts/AuthContext"
-import type Tema from "../../../models/Categoria"
+import type Categoria from "../../../models/Categoria"
 import { buscar, deletar } from "../../../services/Service"
 import { ToastAlerta } from "../../../utils/ToastAlerta"
 

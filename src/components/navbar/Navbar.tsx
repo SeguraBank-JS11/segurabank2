@@ -20,8 +20,8 @@ const Navbar = () => {
 
           {/* Links de Navegação (Desktop) */}
           <div className="hidden md:flex items-center gap-8">
-            <Link to="/" className="text-gray-600 hover:text-bank-blue font-medium transition-colors">Home</Link>
-            <Link to="/produto" className="text-gray-600 hover:text-bank-blue font-medium transition-colors">Produtos</Link>
+            <Link to="/home" className="text-gray-600 hover:text-bank-blue font-medium transition-colors">Home</Link>
+            <Link to="/produtos" className="text-gray-600 hover:text-bank-blue font-medium transition-colors">Produtos</Link>
             <Link to="/sobre" className="text-gray-600 hover:text-bank-blue font-medium transition-colors">Sobre Nós</Link>
           </div>
 
