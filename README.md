@@ -1,4 +1,4 @@
-# Projeto Blog Pessoal - Frontend com React
+# 🛡️ SeguraBank - Sistema de Seguro de Vida
 
 <br />
 
@@ -7,7 +7,12 @@
 </div> 
 <br /> 
 
-## 1. Descrição
+## 💡 Sobre o Projeto
 
-O **Blog Pessoal - Frontend** é uma aplicação web desenvolvida com **React** e **TypeScript**, com o objetivo de consumir e exibir dados de uma API REST construída com **Spring Boot**. A aplicação permite a visualização, criação, edição e exclusão de postagens de blog, categorizadas por temas e vinculadas a usuários autenticados.
+O **SeguraBank** é um sistema desenvolvido para gerenciar o Seguro de Vida oferecido por um banco. O sistema possibilita cadastrar clientes, consultar informações, atualizar dados pessoais e remover registros quando necessário.
+
+O objetivo principal deste projeto é:
+
+> **Proporcionar uma solução simples, direta e eficiente para o banco controlar os clientes que contrataram o seguro, permitindo futuras integrações com apólices, pagamentos e análise de risco.** 
+Esta aplicação foi desenvolvida utilizando o framework NestJS, que garante uma arquitetura modular, escalável e eficiente, seguindo os padrões de design de software.
 
