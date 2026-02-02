@@ -6,5 +6,5 @@ export default interface Categoria {
   usuario: string;
   foto: string;
   senha: string;
-  postagem?: Produto[] | null;
+  produto?: Produto[] | null;
 }
