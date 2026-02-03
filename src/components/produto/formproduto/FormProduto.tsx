@@ -67,7 +67,7 @@ function FormProduto() {
   useEffect(() => {
     setProduto({
       ...produto,
-      categoria: categoria.id,
+      categoria: categoria,
     })
   }, [categoria])
 
@@ -75,8 +75,8 @@ function FormProduto() {
     setProduto({
       ...produto,
       [e.target.name]: e.target.value,
-      categoria: categoria.id,
-      usuario: usuario.id,
+      categoria: categoria,
+      usuario: usuario,
     })
   }
 
