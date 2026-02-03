@@ -6,6 +6,14 @@ export default interface Produto {
   titulo: string;
   valor: number;
   status: boolean;
+<<<<<<< HEAD
   senha: string;
   produto?: Produto[] | null;
+=======
+  descricao: string;
+  categoria: Categoria | null;
+  usuario: Usuario | null;
+  // categoria:number;
+  // usuario: number;
+>>>>>>> dev
 }

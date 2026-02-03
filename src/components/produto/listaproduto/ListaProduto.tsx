@@ -6,6 +6,7 @@ import type Produto from "../../../models/Produto";
 import { buscar } from "../../../services/Service";
 import CardProduto from "../cardproduto/CardProduto";
 import { ToastAlerta } from "../../../utils/ToastAlerta";
+import FormProduto from "../formproduto/FormProduto";
 
 function ListaProdutos() {
 
@@ -34,7 +35,7 @@ function ListaProdutos() {
 
             setIsLoading(true)
 
-            await buscar('/produtos', setProdutos, {
+            await buscar('/apolices', setProdutos, {
                 headers: { Authorization: token }
             })
         } catch (error: any) {

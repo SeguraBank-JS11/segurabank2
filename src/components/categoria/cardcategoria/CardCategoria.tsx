@@ -1,34 +1,63 @@
 import { Link } from 'react-router-dom'
 import type Categoria from '../../../models/Categoria'
+import { Folder, Pencil, Trash2 } from 'lucide-react'
 
-interface CardTemaProps{
-    tema: Tema
+interface CardCategoriaProps {
+  categoria: Categoria
 }
 
-function CardTema({ tema }: CardTemaProps) {
-    return (
-        <div className='border flex flex-col rounded-2xl overflow-hidden justify-between'>
-            <header className='py-2 px-6 bg-indigo-800 text-white font-bold text-2xl'>
-                Tema
-            </header>
-            <p className='p-8 text-3xl bg-slate-200 h-full'>{tema.descricao}</p>
-            
-            <div className="flex">
-                <Link to={`/editartema/${tema.id}`} 
-                    className='w-full text-slate-100 bg-indigo-400 hover:bg-indigo-800 
-                        flex items-center justify-center py-2'>
-                    <button>Editar</button>
-                </Link>
+function CardCategoria({ categoria }: CardCategoriaProps) {
+  return (
+    <div
+      className="
+        bg-white rounded-2xl border border-gray-200
+        shadow-sm hover:shadow-lg transition-all duration-300
+        flex flex-col overflow-hidden
+      "
+    >
+      {/* Header */}
+      <header className="bg-linear-to-r from-blue-100 to-blue-200 px-6 py-4 flex items-center gap-3">
+        <Folder className="text-blue-800" size={22} />
+        <h2 className="text-lg font-semibold text-gray-900">
+          Categoria
+        </h2>
+      </header>
 
-                <Link to={`/deletartema/${tema.id}`} 
-                    className='text-slate-100 bg-red-400 hover:bg-red-700 w-full 
-                    flex items-center justify-center'>
-                    <button>Deletar</button>
-                </Link>
-            </div>
+      {/* Conteúdo */}
+      <div className="p-8 flex-1 flex items-center justify-center bg-gray-50">
+        <p className="text-2xl font-bold text-gray-900 text-center">
+          {categoria.descricao}
+        </p>
+      </div>
 
-        </div>
-    )
+      {/* Ações */}
+      <div className="grid grid-cols-2 border-t border-gray-200">
+        <Link
+          to={`/editarcategoria/${categoria.id}`}
+          className="
+            flex items-center justify-center gap-2 py-3
+            text-blue-800 font-semibold
+            hover:bg-blue-100 transition
+          "
+        >
+          <Pencil size={18} />
+          Editar
+        </Link>
+
+        <Link
+          to={`/deletarcategoria/${categoria.id}`}
+          className="
+            flex items-center justify-center gap-2 py-3
+            text-red-700 font-semibold
+            hover:bg-red-100 transition
+          "
+        >
+          <Trash2 size={18} />
+          Deletar
+        </Link>
+      </div>
+    </div>
+  )
 }
 
-export default CardTema
+export default CardCategoria

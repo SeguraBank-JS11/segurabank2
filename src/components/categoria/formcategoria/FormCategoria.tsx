@@ -1,134 +1,166 @@
-import { useContext, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ClipLoader } from "react-spinners";
-import { AuthContext } from "../../../contexts/AuthContext";
-import type Categoria from "../../../models/Categoria";
-import { atualizar, buscar, cadastrar } from "../../../services/Service";
-import { ToastAlerta } from "../../../utils/ToastAlerta";
+import { useContext, useEffect, useState, type ChangeEvent, type FormEvent } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { ClipLoader } from "react-spinners"
+import { AuthContext } from "../../../contexts/AuthContext"
+import type Categoria from "../../../models/Categoria"
+import { atualizar, buscar, cadastrar } from "../../../services/Service"
+import { ToastAlerta } from "../../../utils/ToastAlerta"
+import { Layers } from "lucide-react"
 
-function FormTema() {
+function FormCategoria() {
 
-    const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [categoria, setCategoria] = useState<Categoria>({} as Categoria)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
-    const [tema, setTema] = useState<Categoria>({} as Categoria)
+  const { usuario, handleLogout } = useContext(AuthContext)
+  const token = usuario.token
 
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+  const { id } = useParams<{ id: string }>()
 
-    const { usuario, handleLogout } = useContext(AuthContext)
-    const token = usuario.token
-
-    const { id } = useParams<{ id: string }>();
-
-    async function buscarPorId(id: string) {
-        try {
-            await buscar(`/temas/${id}`, setTema, {
-                headers: { Authorization: token }
-            })
-        } catch (error: any) {
-            if (error.toString().includes('401')) {
-                handleLogout()
-            }
-        }
+  async function buscarPorId(id: string) {
+    try {
+      await buscar(`/categoria/${id}`, setCategoria, {
+        headers: { Authorization: token }
+      })
+    } catch (error: any) {
+      if (error.toString().includes('401')) handleLogout()
     }
+  }
 
-    useEffect(() => {
-        if (token === '') {
-            ToastAlerta('Você precisa estar logado!', 'info')
-            navigate('/')
-        }
-    }, [token])
+  useEffect(() => {
+    if (token === '') {
+      ToastAlerta('Você precisa estar logado!', 'info')
+      navigate('/')
+    }
+  }, [token])
 
-    useEffect(() => {
-        if (id !== undefined) {
-            buscarPorId(id)
-        }
-    }, [id])
+  useEffect(() => {
+    if (id !== undefined) buscarPorId(id)
+  }, [id])
 
-    function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
-        setTema({
-            ...tema,
-            [e.target.name]: e.target.value
+  function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
+    setCategoria({
+      ...categoria,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  function retornar() {
+    navigate("/categoria")
+  }
+
+  async function gerarNovoCategoria(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      if (id !== undefined) {
+        await atualizar(`/categoria`, categoria, setCategoria, {
+          headers: { Authorization: token }
         })
+        ToastAlerta('Categoria atualizada com sucesso!', 'sucesso')
+      } else {
+        await cadastrar(`/categoria`, categoria, setCategoria, {
+          headers: { Authorization: token }
+        })
+        ToastAlerta('Categoria cadastrada com sucesso!', 'sucesso')
+      }
+    } catch (error: any) {
+      if (error.toString().includes('401')) {
+        handleLogout()
+      } else {
+        ToastAlerta('Erro ao salvar a categoria.', 'erro')
+      }
     }
 
-    function retornar() {
-        navigate("/temas")
-    }
+    setIsLoading(false)
+    retornar()
+  }
 
-    async function gerarNovoTema(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault()
-        setIsLoading(true)
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
 
-        if (id !== undefined) {
-            try {
-                await atualizar(`/temas`, tema, setTema, {
-                    headers: { 'Authorization': token }
-                })
-                ToastAlerta('O Tema foi atualizado com sucesso!', 'sucesso')
-            } catch (error: any) {
-                if (error.toString().includes('401')) {
-                    handleLogout();
-                } else {
-                    ToastAlerta('Erro ao atualizar o tema.', 'erro')
-                }
+        {/* Header */}
+        <header className="bg-linear-to-r from-blue-200 to-blue-300 px-6 py-4 flex items-center gap-3">
+          <Layers className="text-blue-900" size={22} />
+          <h1 className="text-xl font-bold text-gray-900">
+            {id === undefined ? 'Cadastrar Categoria' : 'Editar Categoria'}
+          </h1>
+        </header>
 
-            }
-        } else {
-            try {
-                await cadastrar(`/temas`, tema, setTema, {
-                    headers: { 'Authorization': token }
-                })
-                ToastAlerta('O Tema foi cadastrado com sucesso!', 'sucesso')
-            } catch (error: any) {
-                if (error.toString().includes('401')) {
-                    handleLogout();
-                } else {
-                    ToastAlerta('Erro ao cadastrar o tema.', 'erro')
-                }
+        {/* Form */}
+        <form onSubmit={gerarNovoCategoria} className="p-6 space-y-5">
 
-            }
-        }
+          {/* Nome */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-semibold text-gray-700">
+              Nome da Categoria
+            </label>
+            <input
+              type="text"
+              name="nome"
+              placeholder="Ex: Seguro Residencial"
+              className="input-padrao"
+              value={categoria.nome}
+              onChange={atualizarEstado}
+              required
+            />
+          </div>
 
-        setIsLoading(false)
-        retornar()
-    }
+          {/* Descrição */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-semibold text-gray-700">
+              Descrição da Categoria
+            </label>
+            <input
+              type="text"
+              name="descricao"
+              placeholder="Descrição detalhada da categoria"
+              className="input-padrao"
+              value={categoria.descricao}
+              onChange={atualizarEstado}
+              required
+            />
+          </div>
 
-    return (
-        <div className="container flex flex-col items-center justify-center mx-auto">
-            <h1 className="text-4xl text-center my-8">
-                {id === undefined ? 'Cadastrar Tema' : 'Editar Tema'}
-            </h1>
+          {/* Botão */}
+          <button
+            type="submit"
+            className="
+              w-full mt-4 py-3 rounded-xl font-semibold text-white
+              bg-blue-800 hover:bg-blue-900
+              flex items-center justify-center
+              transition
+            "
+          >
+            {isLoading
+              ? <ClipLoader color="#ffffff" size={22} />
+              : id === undefined ? 'Cadastrar Categoria' : 'Atualizar Categoria'}
+          </button>
 
-            <form className="w-1/2 flex flex-col gap-4" 
-                  onSubmit={gerarNovoTema} >
-                <div className="flex flex-col gap-2">
-                    <label htmlFor="descricao">Descrição do Tema</label>
-                    <input
-                        type="text"
-                        placeholder="Descreva aqui seu tema"
-                        name='descricao'
-                        className="border-2 border-slate-700 rounded p-2"
-                        value={tema.descricao}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-                    />
-                </div>
-                <button
-                    className="rounded text-slate-100 bg-indigo-400 
-                               hover:bg-indigo-800 w-1/2 py-2 mx-auto flex justify-center"
-                    type="submit">
+        </form>
+      </div>
 
-                    { isLoading ? 
-                            <ClipLoader 
-                                color="#ffffff" 
-                                size={24}
-                            /> : 
-                           <span>{id === undefined ? 'Cadastrar' : 'Atualizar'}</span>
-                    }
-
-                </button>
-            </form>
-        </div>
-    );
+      {/* Estilo reutilizável */}
+      <style>
+        {`
+          .input-padrao {
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+          }
+          .input-padrao:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+          }
+        `}
+      </style>
+    </div>
+  )
 }
 
-export default FormTema;
+export default FormCategoria

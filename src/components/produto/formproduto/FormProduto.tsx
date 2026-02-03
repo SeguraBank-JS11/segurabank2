@@ -1,213 +1,241 @@
-import { useContext, useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ClipLoader } from "react-spinners";
-import { AuthContext } from "../../../contexts/AuthContext";
-import type Postagem from "../../../models/Postagem";
-import type Tema from "../../../models/Categoria";
-import { atualizar, buscar, cadastrar } from "../../../services/Service";
-import { ToastAlerta } from "../../../utils/ToastAlerta";
+import { useContext, useEffect, useState, type ChangeEvent, type FormEvent } from "react"
+import { useNavigate, useParams } from "react-router-dom"
+import { ClipLoader } from "react-spinners"
+import { AuthContext } from "../../../contexts/AuthContext"
+import type Produto from "../../../models/Produto"
+import type Categoria from "../../../models/Categoria"
+import { atualizar, buscar, cadastrar } from "../../../services/Service"
+import { ToastAlerta } from "../../../utils/ToastAlerta"
+import { FileText, Tag } from "lucide-react"
 
-function FormPostagem() {
+function FormProduto() {
 
-    const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
-    const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [categoria, setCategoria] = useState<Categoria>({ id: 0, nome: '', descricao: '' })
+  const [produto, setProduto] = useState<Produto>({} as Produto)
 
-    const [temas, setTemas] = useState<Tema[]>([])
+  const { usuario, handleLogout } = useContext(AuthContext)
+  const token = usuario.token
 
-    const [tema, setTema] = useState<Tema>({ id: 0, descricao: '', })
-    
-    const [postagem, setPostagem] = useState<Postagem>({} as Postagem)
+  const { id } = useParams<{ id: string }>()
 
-    const { usuario, handleLogout } = useContext(AuthContext)
-    const token = usuario.token
-
-    const { id } = useParams<{ id: string }>()
-
-    async function buscarPostagemPorId(id: string) {
-        try {
-            await buscar(`/produtos/${id}`, setPostagem, {
-                headers: { Authorization: token }
-            })
-        } catch (error: any) {
-            if (error.toString().includes('401')) {
-                handleLogout()
-            }
-        }
+  async function buscarProdutoPorId(id: string) {
+    try {
+      await buscar(`/apolices/${id}`, setProduto, {
+        headers: { Authorization: token }
+      })
+    } catch (error: any) {
+      if (error.toString().includes('401')) handleLogout()
     }
+  }
 
-    async function buscarTemaPorId(id: string) {
-        try {
-            await buscar(`/temas/${id}`, setTema, {
-                headers: { Authorization: token }
-            })
-        } catch (error: any) {
-            if (error.toString().includes('401')) {
-                handleLogout()
-            }
-        }
+  async function buscarCategoriaPorId(id: string) {
+    try {
+      await buscar(`/categoria/${id}`, setCategoria, {
+        headers: { Authorization: token }
+      })
+    } catch (error: any) {
+      if (error.toString().includes('401')) handleLogout()
     }
+  }
 
-    async function buscarTemas() {
-        try {
-            await buscar('/temas', setTemas, {
-                headers: { Authorization: token }
-            })
-        } catch (error: any) {
-            if (error.toString().includes('401')) {
-                handleLogout()
-            }
-        }
+  async function buscarCategorias() {
+    try {
+      await buscar('/categoria', setCategorias, {
+        headers: { Authorization: token }
+      })
+    } catch (error: any) {
+      if (error.toString().includes('401')) handleLogout()
     }
+  }
 
-    useEffect(() => {
-        if (token === '') {
-            ToastAlerta('Você precisa estar logado', 'info');
-            navigate('/');
-        }
-    }, [token])
+  useEffect(() => {
+    if (token === '') {
+      ToastAlerta('Você precisa estar logado', 'info')
+      navigate('/')
+    }
+  }, [token])
 
-    useEffect(() => {
-        buscarTemas()
+  useEffect(() => {
+    buscarCategorias()
+    if (id !== undefined) buscarProdutoPorId(id)
+  }, [id])
 
-        if (id !== undefined) {
-            buscarPostagemPorId(id)
-        }
-    }, [id])
+  useEffect(() => {
+    setProduto({
+      ...produto,
+      categoria: categoria,
+    })
+  }, [categoria])
 
-    useEffect(() => {
-        setPostagem({
-            ...postagem,
-            tema: tema,
+  function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
+    setProduto({
+      ...produto,
+      [e.target.name]: e.target.value,
+      categoria: categoria,
+      usuario: usuario,
+    })
+  }
+
+  function retornar() {
+    navigate('/produtos')
+  }
+
+  async function gerarNovaProduto(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      if (id !== undefined) {
+        await atualizar(`/apolices`, produto, setProduto, {
+          headers: { Authorization: token }
         })
-    }, [tema])
-
-    function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
-        setPostagem({
-            ...postagem,
-            [e.target.name]: e.target.value,
-            tema: tema,
-            usuario: usuario,
-        });
+        ToastAlerta('Apólice atualizada com sucesso', 'sucesso')
+      } else {
+        await cadastrar(`/apolices`, produto, setProduto, {
+          headers: { Authorization: token }
+        })
+        ToastAlerta('Produto cadastrada com sucesso', 'sucesso')
+      }
+    } catch (error: any) {
+      if (error.toString().includes('401')) {
+        handleLogout()
+      } else {
+        ToastAlerta('Erro ao salvar a Apólice', 'erro')
+      }
     }
 
-    function retornar() {
-        navigate('/produtos');
-    }
+    setIsLoading(false)
+    retornar()
+  }
 
-    async function gerarNovaPostagem(e: FormEvent<HTMLFormElement>) {
-        e.preventDefault()
-        setIsLoading(true)
+  const carregandoCategoria = categoria.descricao === ''
+  produto.status = true
 
-        if (id !== undefined) {
-            try {
-                await atualizar(`/produtos`, postagem, setPostagem, {
-                    headers: {
-                        Authorization: token,
-                    },
-                });
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+        
+        {/* Header */}
+        <header className="bg-linear-to-r from-blue-200 to-blue-300 px-6 py-4 flex items-center gap-3">
+          <FileText className="text-blue-900" size={22} />
+          <h1 className="text-xl font-bold text-gray-900">
+            {id !== undefined ? 'Editar Apólice' : 'Cadastrar Apólice'}
+          </h1>
+        </header>
 
-                ToastAlerta('Postagem atualizada com sucesso', 'sucesso')
+        {/* Form */}
+        <form onSubmit={gerarNovaProduto} className="p-6 space-y-5">
 
-            } catch (error: any) {
-                if (error.toString().includes('401')) {
-                    handleLogout()
-                } else {
-                    ToastAlerta('Erro ao atualizar a Postagem', 'erro')
-                }
-            }
+          {/* Título */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-semibold text-gray-700">
+              Título da Apólice
+            </label>
+            <input
+              type="text"
+              name="titulo"
+              required
+              placeholder="Ex: Seguro Residencial Premium"
+              className="input-padrao"
+              value={produto.titulo}
+              onChange={atualizarEstado}
+            />
+          </div>
 
-        } else {
-            try {
-                await cadastrar(`/produtos`, postagem, setPostagem, {
-                    headers: {
-                        Authorization: token,
-                    },
-                })
+          {/* Valor */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-semibold text-gray-700">
+              Valor da Apólice
+            </label>
+            <input
+              type="number"
+              name="valor"
+              required
+              placeholder="Valor contratado"
+              className="input-padrao"
+              value={produto.valor}
+              onChange={atualizarEstado}
+            />
+          </div>
 
-                ToastAlerta('Postagem cadastrada com sucesso', 'sucesso');
+          {/* Descrição */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-semibold text-gray-700">
+              Descrição
+            </label>
+            <input
+              type="text"
+              name="descricao"
+              required
+              placeholder="Descrição da apólice"
+              className="input-padrao"
+              value={produto.descricao}
+              onChange={atualizarEstado}
+            />
+          </div>
 
-            } catch (error: any) {
-                if (error.toString().includes('401')) {
-                    handleLogout()
-                } else {
-                    ToastAlerta('Erro ao cadastrar a Postagem', 'erro');
-                }
-            }
-        }
+          {/* Categoria */}
+          <div className="flex flex-col gap-1">
+            <label className="text-sm font-semibold text-gray-700 flex items-center gap-1">
+              <Tag size={16} />
+              Categoria
+            </label>
+            <select
+              className="input-padrao"
+              onChange={(e) => buscarCategoriaPorId(e.currentTarget.value)}
+            >
+              <option value="" disabled selected>
+                Selecione uma categoria
+              </option>
+              {categorias.map((categoria) => (
+                <option key={categoria.id} value={categoria.id}>
+                  {categoria.descricao}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        setIsLoading(false)
-        retornar()
-    }
+          {/* Botão */}
+          <button
+            type="submit"
+            disabled={carregandoCategoria}
+            className="
+              w-full mt-4 py-3 rounded-xl font-semibold text-white
+              bg-blue-800 hover:bg-blue-900
+              disabled:bg-gray-300
+              flex items-center justify-center
+              transition
+            "
+          >
+            {isLoading
+              ? <ClipLoader color="#ffffff" size={22} />
+              : id === undefined ? 'Cadastrar Apólice' : 'Atualizar Apólice'}
+          </button>
+        </form>
+      </div>
 
-    const carregandoTema = tema.descricao === '';
-
-
-    return (
-        <div className="container flex flex-col mx-auto items-center">
-            <h1 className="text-4xl text-center my-8">
-                 {id !== undefined ? 'Editar Postagem' : 'Cadastrar Postagem'}
-            </h1>
-
-            <form className="flex flex-col w-1/2 gap-4"
-                onSubmit={gerarNovaPostagem}>
-                <div className="flex flex-col gap-2">
-                    <label htmlFor="titulo">Título da Postagem</label>
-                    <input
-                        type="text"
-                        placeholder="Titulo"
-                        name="titulo"
-                        required
-                        className="border-2 border-slate-700 rounded p-2"
-                        value={postagem.titulo}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-                    />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <label htmlFor="titulo">Texto da Postagem</label>
-                    <input
-                        type="text"
-                        placeholder="Texto"
-                        name="texto"
-                        required
-                        className="border-2 border-slate-700 rounded p-2"
-                         value={postagem.texto}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-                    />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <p>Tema da Postagem</p>
-                    <select name="tema" id="tema" className='border p-2 border-slate-800 rounded' 
-                        onChange={(e) => buscarTemaPorId(e.currentTarget.value)}
-                    >
-                        <option value="" selected disabled>Selecione um Tema</option>
-                        
-                        {temas.map((tema) => (
-                            <>
-                                <option value={tema.id} >{tema.descricao}</option>
-                            </>
-                        ))}
-
-                    </select>
-                </div>
-                <button 
-                    type='submit' 
-                    className='rounded disabled:bg-slate-200 bg-indigo-400 hover:bg-indigo-800
-                               text-white font-bold w-1/2 mx-auto py-2 flex justify-center'
-                               disabled={carregandoTema}
-                >
-                    { isLoading ? 
-                            <ClipLoader 
-                                color="#ffffff" 
-                                size={24}
-                            /> : 
-                           <span>{id === undefined ? 'Cadastrar' : 'Atualizar'}</span>
-                    }
-
-                </button>
-            </form>
-        </div>
-    );
+      {/* Input padrão reutilizável */}
+      <style>
+        {`
+          .input-padrao {
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+          }
+          .input-padrao:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+          }
+        `}
+      </style>
+    </div>
+  )
 }
 
-export default FormPostagem;
+export default FormProduto
