@@ -3,9 +3,10 @@ import type Usuario from "./Usuario";
 
 export default interface Produto {
   id: number;
-  nome: string;
-  usuario: string;
-  foto: string;
-  senha: string;
-  postagem?: Produto[] | null;
+  titulo: string;
+  valor: number;
+  status: boolean;
+  descricao: string;
+  categoria?: Categoria | null;
+  usuario?: Usuario | null;
 }

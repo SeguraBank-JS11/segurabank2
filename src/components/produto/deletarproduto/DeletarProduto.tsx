@@ -20,7 +20,7 @@ function DeletarProduto() {
 
     async function buscarPorId(id: string) {
         try {
-            await buscar(`/produtos/${id}`, setProduto, {
+            await buscar(`/apolices/${id}`, setProduto, {
                 headers: {
                     'Authorization': token
                 }
@@ -49,7 +49,7 @@ function DeletarProduto() {
         setIsLoading(true)
 
         try {
-            await deletar(`/produtos/${id}`, {
+            await deletar(`/apolices/${id}`, {
                 headers: {
                     'Authorization': token
                 }
@@ -70,7 +70,7 @@ function DeletarProduto() {
     }
 
     function retornar() {
-        navigate("/produtos")
+        navigate("/apolices")
     }
     
     return (
@@ -88,7 +88,7 @@ function DeletarProduto() {
                 </header>
                 <div className="p-4">
                     <p className='text-xl h-full'>{produto.titulo}</p>
-                    <p>{produto.texto}</p>
+                    <p>{produto.titulo}</p>
                 </div>
                 <div className="flex">
                     <button 

@@ -2,31 +2,31 @@ import { useContext, useEffect, useState, type ChangeEvent, type FormEvent } fro
 import { useNavigate, useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { AuthContext } from "../../../contexts/AuthContext";
-import type Postagem from "../../../models/Postagem";
-import type Tema from "../../../models/Categoria";
+import type Produto from "../../../models/Produto";
+import type Categoria from "../../../models/Categoria";
 import { atualizar, buscar, cadastrar } from "../../../services/Service";
 import { ToastAlerta } from "../../../utils/ToastAlerta";
 
-function FormPostagem() {
+function FormProduto() {
 
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
-    const [temas, setTemas] = useState<Tema[]>([])
+    const [categorias, setCategorias] = useState<Categoria[]>([])
 
-    const [tema, setTema] = useState<Tema>({ id: 0, descricao: '', })
+    const [categoria, setCategoria] = useState<Categoria>({ id: 0, nome:'', descricao: '' })
     
-    const [postagem, setPostagem] = useState<Postagem>({} as Postagem)
+    const [produto, setProduto] = useState<Produto>({} as Produto)
 
     const { usuario, handleLogout } = useContext(AuthContext)
     const token = usuario.token
 
     const { id } = useParams<{ id: string }>()
 
-    async function buscarPostagemPorId(id: string) {
+    async function buscarProdutoPorId(id: string) {
         try {
-            await buscar(`/produtos/${id}`, setPostagem, {
+            await buscar(`/apolices/${id}`, setProduto, {
                 headers: { Authorization: token }
             })
         } catch (error: any) {
@@ -36,9 +36,9 @@ function FormPostagem() {
         }
     }
 
-    async function buscarTemaPorId(id: string) {
+    async function buscarCategoriaPorId(id: string) {
         try {
-            await buscar(`/temas/${id}`, setTema, {
+            await buscar(`/categoria/${id}`, setCategoria, {
                 headers: { Authorization: token }
             })
         } catch (error: any) {
@@ -48,9 +48,9 @@ function FormPostagem() {
         }
     }
 
-    async function buscarTemas() {
+    async function buscarCategorias() {
         try {
-            await buscar('/temas', setTemas, {
+            await buscar('/categoria', setCategorias, {
                 headers: { Authorization: token }
             })
         } catch (error: any) {
@@ -68,70 +68,70 @@ function FormPostagem() {
     }, [token])
 
     useEffect(() => {
-        buscarTemas()
+        buscarCategorias()
 
         if (id !== undefined) {
-            buscarPostagemPorId(id)
+            buscarProdutoPorId(id)
         }
     }, [id])
 
     useEffect(() => {
-        setPostagem({
-            ...postagem,
-            tema: tema,
+        setProduto({
+            ...produto,
+            categoria: categoria,
         })
-    }, [tema])
+    }, [categoria])
 
     function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
-        setPostagem({
-            ...postagem,
+        setProduto({
+            ...produto,
             [e.target.name]: e.target.value,
-            tema: tema,
+            categoria: categoria,
             usuario: usuario,
         });
     }
 
     function retornar() {
-        navigate('/produtos');
+        navigate('/apolices');
     }
 
-    async function gerarNovaPostagem(e: FormEvent<HTMLFormElement>) {
+    async function gerarNovaProduto(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
         setIsLoading(true)
 
         if (id !== undefined) {
             try {
-                await atualizar(`/produtos`, postagem, setPostagem, {
+                await atualizar(`/apolices`, produto, setProduto, {
                     headers: {
                         Authorization: token,
                     },
                 });
 
-                ToastAlerta('Postagem atualizada com sucesso', 'sucesso')
+                ToastAlerta('Apólice atualizada com sucesso', 'sucesso')
 
             } catch (error: any) {
                 if (error.toString().includes('401')) {
                     handleLogout()
                 } else {
-                    ToastAlerta('Erro ao atualizar a Postagem', 'erro')
+                    ToastAlerta('Erro ao atualizar a Apólice', 'erro')
                 }
             }
 
         } else {
             try {
-                await cadastrar(`/produtos`, postagem, setPostagem, {
+                await cadastrar(`/apolices`, produto, setProduto, {
                     headers: {
                         Authorization: token,
                     },
                 })
 
-                ToastAlerta('Postagem cadastrada com sucesso', 'sucesso');
+                ToastAlerta('Produto cadastrada com sucesso', 'sucesso');
 
             } catch (error: any) {
                 if (error.toString().includes('401')) {
                     handleLogout()
                 } else {
-                    ToastAlerta('Erro ao cadastrar a Postagem', 'erro');
+                    ToastAlerta('Erro ao cadastrar a Produto', 'erro');
                 }
             }
         }
@@ -140,51 +140,51 @@ function FormPostagem() {
         retornar()
     }
 
-    const carregandoTema = tema.descricao === '';
+    const carregandoCategoria = categoria.descricao === '';
 
 
     return (
         <div className="container flex flex-col mx-auto items-center">
             <h1 className="text-4xl text-center my-8">
-                 {id !== undefined ? 'Editar Postagem' : 'Cadastrar Postagem'}
+                 {id !== undefined ? 'Editar Produto' : 'Cadastrar Apólice'}
             </h1>
 
             <form className="flex flex-col w-1/2 gap-4"
-                onSubmit={gerarNovaPostagem}>
+                onSubmit={gerarNovaProduto}>
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="titulo">Título da Postagem</label>
+                    <label htmlFor="titulo">Título da Produto</label>
                     <input
                         type="text"
                         placeholder="Titulo"
                         name="titulo"
                         required
                         className="border-2 border-slate-700 rounded p-2"
-                        value={postagem.titulo}
+                        value={produto.titulo}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
                     />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="titulo">Texto da Postagem</label>
+                    <label htmlFor="titulo">Texto da Produto</label>
                     <input
                         type="text"
                         placeholder="Texto"
                         name="texto"
                         required
                         className="border-2 border-slate-700 rounded p-2"
-                         value={postagem.texto}
+                         value={produto.titulo}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
                     />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <p>Tema da Postagem</p>
-                    <select name="tema" id="tema" className='border p-2 border-slate-800 rounded' 
-                        onChange={(e) => buscarTemaPorId(e.currentTarget.value)}
+                    <p>Categoria da Produto</p>
+                    <select name="categoria" id="categoria" className='border p-2 border-slate-800 rounded' 
+                        onChange={(e) => buscarCategoriaPorId(e.currentTarget.value)}
                     >
-                        <option value="" selected disabled>Selecione um Tema</option>
+                        <option value="" selected disabled>Selecione um Categoria</option>
                         
-                        {temas.map((tema) => (
+                        {categorias.map((categoria) => (
                             <>
-                                <option value={tema.id} >{tema.descricao}</option>
+                                <option value={categoria.id} >{categoria.descricao}</option>
                             </>
                         ))}
 
@@ -194,7 +194,7 @@ function FormPostagem() {
                     type='submit' 
                     className='rounded disabled:bg-slate-200 bg-indigo-400 hover:bg-indigo-800
                                text-white font-bold w-1/2 mx-auto py-2 flex justify-center'
-                               disabled={carregandoTema}
+                               disabled={carregandoCategoria}
                 >
                     { isLoading ? 
                             <ClipLoader 
@@ -210,4 +210,4 @@ function FormPostagem() {
     );
 }
 
-export default FormPostagem;
+export default FormProduto;

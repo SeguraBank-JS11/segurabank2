@@ -7,6 +7,8 @@ import Footer from './components/footer/Footer'
 // Páginas
 import Home from './pages/home/Home'
 import About from './pages/sobre/About'
+import Cadastro from './pages/cadastro/Cadastro'
+import Login from './pages/login/Login'
 
 // Categoria (TASK ATUAL)
 import ListaCategorias from './components/categoria/listaCategoria/ListaCategoria'
@@ -43,9 +45,10 @@ function App() {
               <Routes>
 
                 {/* Rotas públicas */}
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Login />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/sobre" element={<About />} />
+                <Route path="/cadastro"	element={<Cadastro />}/>
 
                 {/* ========================= */}
                 {/* ROTAS DE CATEGORIA */}
