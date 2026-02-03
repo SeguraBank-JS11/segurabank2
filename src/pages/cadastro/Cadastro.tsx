@@ -1,17 +1,16 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import { ClipLoader } from "react-spinners";
-import type Usuario from "../../models/Usuario";
-import { cadastrarUsuario } from "../../services/Service";
-import { ToastAlerta } from "../../utils/ToastAlerta";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react"
+import { useNavigate } from "react-router-dom"
+import { ClipLoader } from "react-spinners"
+import type Usuario from "../../models/Usuario"
+import { cadastrarUsuario } from "../../services/Service"
+import { ToastAlerta } from "../../utils/ToastAlerta"
+import { UserPlus } from "lucide-react"
 
 function Cadastro() {
 
   const navigate = useNavigate()
-  
   const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const[confirmarSenha, setConfirmarSenha] = useState<string>("")
+  const [confirmarSenha, setConfirmarSenha] = useState<string>("")
 
   const [usuario, setUsuario] = useState<Usuario>({
     id: 0,
@@ -22,45 +21,41 @@ function Cadastro() {
     dataNascimento: new Date(),
     tipo: '',
   })
-  
+
   useEffect(() => {
-    if (usuario.id !== 0){
-      retornar()
-    }
+    if (usuario.id !== 0) retornar()
   }, [usuario])
 
-  function retornar(){
+  function retornar() {
     navigate('/')
   }
 
-  function atualizarEstado(e: ChangeEvent<HTMLInputElement>){
+  function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
     setUsuario({
       ...usuario,
       [e.target.name]: e.target.value
     })
-
   }
 
-  function handleConfirmarSenha(e: ChangeEvent<HTMLInputElement>){
+  function handleConfirmarSenha(e: ChangeEvent<HTMLInputElement>) {
     setConfirmarSenha(e.target.value)
   }
 
-  async function cadastrarNovoUsuario(e: FormEvent<HTMLFormElement>){
+  async function cadastrarNovoUsuario(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
 
-    if(confirmarSenha === usuario.senha && usuario.senha.length >= 8){
-
+    if (confirmarSenha === usuario.senha && usuario.senha.length >= 8) {
       setIsLoading(true)
 
-      try{
+      try {
         await cadastrarUsuario(`/usuarios/cadastrar`, usuario, setUsuario)
         ToastAlerta('Usuário cadastrado com sucesso!', 'sucesso')
-      }catch(error){
+      } catch {
         ToastAlerta('Erro ao cadastrar o usuário!', 'erro')
       }
-    }else{
-      ToastAlerta('Dados do usuário inconsistentes! Verifique as informações do cadastro.', 'erro')
-      setUsuario({...usuario, senha: ''})
+    } else {
+      ToastAlerta('Dados inconsistentes. Verifique a senha.', 'erro')
+      setUsuario({ ...usuario, senha: '' })
       setConfirmarSenha('')
     }
 
@@ -68,128 +63,141 @@ function Cadastro() {
   }
 
   return (
-    <>
-      <div className="grid grid-cols-1 lg:grid-cols-2 h-screen 
-            place-items-center font-bold">
-        <div
-          className="bg-[url('https://i.imgur.com/ZZFAmzo.jpg')] lg:block hidden bg-no-repeat 
-                    w-full min-h-screen bg-cover bg-center"
-        ></div>
-        <form className='flex justify-center items-center flex-col w-2/3 gap-3' 
-              onSubmit={cadastrarNovoUsuario}>
+    <div className="grid grid-cols-1 lg:grid-cols-2 min-h-screen">
 
-          <h2 className='text-slate-900 text-5xl'>Cadastrar</h2>
-          <div className="flex flex-col w-full">
-            <label htmlFor="nome">Nome</label>
-            <input
-              type="text"
-              id="nome"
-              name="nome"
-              placeholder="Nome"
-              className="border-2 border-slate-700 rounded p-2"
-              value = {usuario.nome}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-            />
+      {/* Imagem lateral */}
+      <div
+        className="
+          hidden lg:block bg-cover bg-center
+          bg-[url('https://i.imgur.com/ZZFAmzo.jpg')]
+        "
+      />
+
+      {/* Formulário */}
+      <div className="flex items-center justify-center bg-gray-50 px-6">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-200">
+
+          {/* Header */}
+          <div className="bg-linear-to-r from-blue-200 to-blue-300 px-6 py-4 flex items-center gap-3 rounded-t-2xl">
+            <UserPlus className="text-blue-900" size={22} />
+            <h1 className="text-xl font-bold text-gray-900">
+              Criar Conta
+            </h1>
           </div>
-          <div className="flex flex-col w-full">
-            <label htmlFor="usuario">Usuario</label>
-            <input
-              type="text"
-              id="usuario"
-              name="usuario"
-              placeholder="Usuario"
-              className="border-2 border-slate-700 rounded p-2"
-              value = {usuario.usuario}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-            />
-          </div>
-          <div className="flex flex-col w-full">
-            <label htmlFor="foto">Foto</label>
-            <input
-              type="text"
-              id="foto"
-              name="foto"
-              placeholder="Foto"
-              className="border-2 border-slate-700 rounded p-2"
-              value = {usuario.foto}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-            />
-          </div>
-          <div className="flex flex-col w-full">
-            <label htmlFor="tipo">tipo</label>
-            <input
-              type="text"
-              id="tipo"
-              name="tipo"
-              placeholder="Tipo de Usuário"
-              className="border-2 border-slate-700 rounded p-2"
-              value = {usuario.tipo}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-            />
-          </div>
-          <div className="flex flex-col w-full">
-            <label htmlFor="dataNascimento">Data de Nascimento</label>
-            <input
-              type="date"
-              id="dataNascimento"
-              name="dataNascimento"
-              //placeholder="YYYY-MM-DD"
-              className="border-2 border-slate-700 rounded p-2"
-              //value = "1991-01-01"
-              //value ={usuario.dataNascimento}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-            />
-          </div>
-          <div className="flex flex-col w-full">
-            <label htmlFor="senha">Senha</label>
-            <input
-              type="password"
-              id="senha"
+
+          {/* Form */}
+          <form
+            onSubmit={cadastrarNovoUsuario}
+            className="p-6 space-y-4"
+          >
+
+            <Input label="Nome" name="nome" value={usuario.nome} onChange={atualizarEstado} />
+            <Input label="Usuário" name="usuario" value={usuario.usuario} onChange={atualizarEstado} />
+            <Input label="Foto (URL)" name="foto" value={usuario.foto} onChange={atualizarEstado} />
+            <Input label="Tipo de Usuário" name="tipo" value={usuario.tipo} onChange={atualizarEstado} />
+
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-semibold text-gray-700">
+                Data de Nascimento
+              </label>
+              <input
+                type="date"
+                name="dataNascimento"
+                className="input-padrao"
+                onChange={atualizarEstado}
+              />
+            </div>
+
+            <Input
+              label="Senha"
               name="senha"
-              placeholder="Senha"
-              className="border-2 border-slate-700 rounded p-2"
-              value = {usuario.senha}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
-            />
-          </div>
-          <div className="flex flex-col w-full">
-            <label htmlFor="confirmarSenha">Confirmar Senha</label>
-            <input
               type="password"
-              id="confirmarSenha"
-              name="confirmarSenha"
-              placeholder="Confirmar Senha"
-              className="border-2 border-slate-700 rounded p-2"
-              value={confirmarSenha}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => handleConfirmarSenha(e)}
+              value={usuario.senha}
+              onChange={atualizarEstado}
             />
-          </div>
-          <div className="flex justify-around w-full gap-8">
-            <button 
-                type='reset'
-                className='rounded text-white bg-red-400 hover:bg-red-700 w-1/2 py-2'
+
+            <Input
+              label="Confirmar Senha"
+              name="confirmarSenha"
+              type="password"
+              value={confirmarSenha}
+              onChange={handleConfirmarSenha}
+            />
+
+            {/* Botões */}
+            <div className="flex gap-4 pt-4">
+              <button
+                type="button"
                 onClick={retornar}
-             >
+                className="
+                  w-1/2 py-3 rounded-xl font-semibold
+                  bg-red-500 hover:bg-red-700 text-white
+                  transition
+                "
+              >
                 Cancelar
-            </button>
-            <button 
-                type='submit'
-                className='rounded text-white bg-indigo-400 
-                           hover:bg-indigo-900 w-1/2 py-2
-                           flex justify-center' 
-                >
-                { isLoading ? 
-                  <ClipLoader 
-                    color="#ffffff" 
-                    size={24}
-                  /> : 
-                  <span>Cadastrar</span>
-                }
-            </button>
-          </div>
-        </form>
+              </button>
+
+              <button
+                type="submit"
+                className="
+                  w-1/2 py-3 rounded-xl font-semibold
+                  bg-blue-800 hover:bg-blue-900 text-white
+                  flex items-center justify-center transition
+                "
+              >
+                {isLoading
+                  ? <ClipLoader color="#fff" size={22} />
+                  : 'Cadastrar'}
+              </button>
+            </div>
+
+          </form>
+        </div>
       </div>
-    </>
+
+      {/* Estilos reutilizáveis */}
+      <style>
+        {`
+          .input-padrao {
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+          }
+          .input-padrao:focus {
+            outline: none;
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+          }
+        `}
+      </style>
+    </div>
+  )
+}
+
+/* Input reutilizável (visual apenas) */
+function Input({
+  label,
+  name,
+  value,
+  onChange,
+  type = 'text'
+}: any) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-semibold text-gray-700">
+        {label}
+      </label>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="input-padrao"
+        required
+      />
+    </div>
   )
 }
 
