@@ -81,7 +81,7 @@ function FormProduto() {
   }
 
   function retornar() {
-    navigate('/apolices')
+    navigate('/produtos')
   }
 
   async function gerarNovaProduto(e: FormEvent<HTMLFormElement>) {

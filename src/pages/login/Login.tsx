@@ -114,7 +114,7 @@ function Login() {
       <div
         className="
           hidden lg:block bg-cover bg-center
-          bg-[url('https://i.imgur.com/ZZFAmzo.jpg')]
+          bg-[url('https://i.imgur.com/AiBccVG.png')]
         "
       />
 
