@@ -70,7 +70,7 @@ function DeletarProduto() {
     }
 
     function retornar() {
-        navigate("/apolices")
+        navigate("/produtos")
     }
     
     return (

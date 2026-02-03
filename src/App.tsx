@@ -17,6 +17,8 @@ import DeletarCategoria from './components/categoria/deletarcategoria/DeletarCat
 
 // Produto (já existente no projeto)
 import ListaProdutos from './components/produto/listaproduto/ListaProduto'
+import FormProduto from './components/produto/formproduto/FormProduto'
+import DeletarProduto from './components/produto/deletarproduto/DeletarProduto'
 
 // Contexto de autenticação
 import { AuthProvider } from './contexts/AuthContext'
@@ -88,12 +90,12 @@ function App() {
                 />
 
                 {/* As próximas ficam para depois */}
-                {/*
+                
                 <Route path="/cadastrarproduto" element={<FormProduto />} />
                 <Route path="/editarproduto/:id" element={<FormProduto />} />
                 <Route path="/deletarproduto/:id" element={<DeletarProduto />} />
-                <Route path="/perfil" element={<Perfil />} />
-                */}
+                {/* <Route path="/perfil" element={<Perfil />} /> */}
+               
 
               </Routes>
             </main>

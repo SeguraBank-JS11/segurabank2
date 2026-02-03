@@ -32,6 +32,12 @@ const Navbar = () => {
             >
               Categorias
             </Link>
+            <Link
+              to="/cadastrarcategoria"
+              className="text-gray-600 hover:text-bank-blue font-medium transition-colors"
+            >
+              Cadastrar Categorias
+            </Link>
 
             <Link
               to="/produtos"
@@ -39,6 +45,13 @@ const Navbar = () => {
             >
               Produtos
             </Link>
+            <Link
+              to="/cadastrarproduto"
+              className="text-gray-600 hover:text-bank-blue font-medium transition-colors"
+            >
+              Cadastrar Apólice
+            </Link>
+
             <Link
               to="/sobre"
               className="text-gray-600 hover:text-bank-blue font-medium transition-colors"

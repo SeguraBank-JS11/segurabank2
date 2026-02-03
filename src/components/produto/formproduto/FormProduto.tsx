@@ -16,6 +16,8 @@ function FormProduto() {
     const [categorias, setCategorias] = useState<Categoria[]>([])
 
     const [categoria, setCategoria] = useState<Categoria>({ id: 0, nome:'', descricao: '' })
+
+    // const [usuario, setUsuario] = useState<Categoria>({ id: 0, nome:'', descricao: '' })
     
     const [produto, setProduto] = useState<Produto>({} as Produto)
 
@@ -39,6 +41,18 @@ function FormProduto() {
     async function buscarCategoriaPorId(id: string) {
         try {
             await buscar(`/categoria/${id}`, setCategoria, {
+                headers: { Authorization: token }
+            })
+        } catch (error: any) {
+            if (error.toString().includes('401')) {
+                handleLogout()
+            }
+        }
+    }
+
+    async function buscarUsuarioPorId(id: string) {
+        try {
+            await buscar(`/usuarios/${id}`, setCategoria, {
                 headers: { Authorization: token }
             })
         } catch (error: any) {
@@ -78,7 +92,7 @@ function FormProduto() {
     useEffect(() => {
         setProduto({
             ...produto,
-            categoria: categoria,
+            categoria: categoria.id,
         })
     }, [categoria])
 
@@ -86,13 +100,13 @@ function FormProduto() {
         setProduto({
             ...produto,
             [e.target.name]: e.target.value,
-            categoria: categoria,
-            usuario: usuario,
+            categoria: categoria.id,
+            usuario: usuario.id,
         });
     }
 
     function retornar() {
-        navigate('/apolices');
+        navigate('/produtos');
     }
 
     async function gerarNovaProduto(e: FormEvent<HTMLFormElement>) {
@@ -141,8 +155,13 @@ function FormProduto() {
     }
 
     const carregandoCategoria = categoria.descricao === '';
+    // TESTANDO INJETAR COM NUMBER O USER E CATEG AO INVES DE OBJETOS
+    produto.status=true;
+    //produto.categoria=1;
+    //produto.usuario=1;
 
-
+    
+    console.log(produto)
     return (
         <div className="container flex flex-col mx-auto items-center">
             <h1 className="text-4xl text-center my-8">
@@ -152,7 +171,7 @@ function FormProduto() {
             <form className="flex flex-col w-1/2 gap-4"
                 onSubmit={gerarNovaProduto}>
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="titulo">Título da Produto</label>
+                    <label htmlFor="titulo">Título da Apólice</label>
                     <input
                         type="text"
                         placeholder="Titulo"
@@ -164,17 +183,45 @@ function FormProduto() {
                     />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <label htmlFor="titulo">Texto da Produto</label>
+                    <label htmlFor="valor">Valor da Apólice</label>
                     <input
-                        type="text"
-                        placeholder="Texto"
-                        name="texto"
+                        type="number"
+                        placeholder="Valor da Apólice Contratada"
+                        name="valor"
                         required
                         className="border-2 border-slate-700 rounded p-2"
-                         value={produto.titulo}
+                         value={produto.valor}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
                     />
                 </div>
+                <div className="flex flex-col gap-2">
+                    <label htmlFor="descricao">Descrição da Apólice</label>
+                    <input
+                        type="string"
+                        placeholder="Descrição da Apólice Contratada"
+                        name="descricao"
+                        required
+                        className="border-2 border-slate-700 rounded p-2"
+                         value={produto.descricao}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+                    />
+                </div>
+                {/* <div className="flex flex-col gap-2">
+                    <label htmlFor="status">Status da Apólice</label>
+                    <input
+                        type="string"
+                        placeholder="Valor da Apólice Contratada"
+                        name="status"
+                        required
+                        className="border-2 border-slate-700 rounded p-2"
+                        //value={produto.status}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+                    />
+                </div> */}
+
+
+
+
                 <div className="flex flex-col gap-2">
                     <p>Categoria da Produto</p>
                     <select name="categoria" id="categoria" className='border p-2 border-slate-800 rounded' 
@@ -190,6 +237,36 @@ function FormProduto() {
 
                     </select>
                 </div>
+                {/* <div className="flex flex-col gap-2">
+                    <label htmlFor="descricao">Usuário Responsável</label>
+                    <input
+                        type="number"
+                        placeholder="ID do Usuário aqui"
+                        name="usuario"
+                        required
+                        className="border-2 border-slate-700 rounded p-2"
+                         //value={produto.usuario}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+                    />
+                </div> */}
+
+
+
+                {/* <div className="flex flex-col gap-2">
+                    <p>Usuário Responsável</p>
+                    <select name="usuario" id="usuario" className='border p-2 border-slate-800 rounded' 
+                        onChange={(e) => buscarUsuarioPorId(e.currentTarget.value)}
+                    >
+                        <option value="" selected disabled>Selecione um Usuário</option>
+                        
+                        {usuarios.map((usuario) => (
+                            <>
+                                <option value={usuario.id} >{usuario.nome}</option>
+                            </>
+                        ))}
+
+                    </select>
+                </div> */}
                 <button 
                     type='submit' 
                     className='rounded disabled:bg-slate-200 bg-indigo-400 hover:bg-indigo-800
