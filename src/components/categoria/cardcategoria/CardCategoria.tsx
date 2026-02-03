@@ -19,7 +19,7 @@ function CardCategoria({ categoria }: CardCategoriaProps) {
       <header className="bg-linear-to-r from-blue-100 to-blue-200 px-6 py-4 flex items-center gap-3">
         <Folder className="text-blue-800" size={22} />
         <h2 className="text-lg font-semibold text-gray-900">
-          Categoria
+          {categoria.nome}
         </h2>
       </header>
 
