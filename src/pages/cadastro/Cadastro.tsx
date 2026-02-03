@@ -133,9 +133,9 @@ function Cadastro() {
               type="date"
               id="dataNascimento"
               name="dataNascimento"
-              placeholder="YYYY-MM-DD"
+              //placeholder="YYYY-MM-DD"
               className="border-2 border-slate-700 rounded p-2"
-              value = "1991-01-01"
+              //value = "1991-01-01"
               //value ={usuario.dataNascimento}
               onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
             />
