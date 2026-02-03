@@ -23,11 +23,12 @@ function CardProduto({ produto }: CardProdutosProps) {
                 <div className='p-4 '>
                     <h4 className='text-lg font-semibold uppercase'>{produto.titulo}</h4>
                     <p>{produto.titulo}</p>
-                    <p>Tema: {produto.categoria?.descricao}</p>
-                    <p>Data: {new Intl.DateTimeFormat("pt-BR", {
+                    <p>Categoria: {produto.categoria?.descricao}</p>
+                    <p>Valor: {produto.valor}</p>
+                    {/* <p>Valor: {new Intl.DateTimeFormat("pt-BR", {
                         dateStyle: 'full',
                         timeStyle: 'medium',
-                    }).format(new Date(produto.valor))}</p>
+                    }).format(new Date(produto.valor))}</p> */}
                 </div>
             </div>
             <div className="flex">

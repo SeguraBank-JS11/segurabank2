@@ -7,7 +7,7 @@ export default interface Produto {
   valor: number;
   status: boolean;
   descricao: string;
-  categoria:number;
+  categoria: Categoria | number;
   usuario: number;
   //categoria: Categoria | null;
   //usuario: Usuario | null;
