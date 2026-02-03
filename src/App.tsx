@@ -53,7 +53,7 @@ function App() {
 
                 {/* Listar categorias */}
                 <Route
-                  path="/categorias"
+                  path="/categoria"
                   element={<ListaCategorias />}
                 />
 

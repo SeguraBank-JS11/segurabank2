@@ -27,7 +27,7 @@ const Navbar = () => {
             </Link>
 
             <Link
-              to="/categorias"
+              to="/categoria"
               className="text-gray-600 hover:text-bank-blue font-medium transition-colors"
             >
               Categorias
