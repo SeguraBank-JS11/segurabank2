@@ -10,34 +10,47 @@ import { ToastAlerta } from "../../../utils/ToastAlerta";
 /**
  * DeletarCategoria
  *
- * Responsável por:
- * - Buscar a categoria pelo id
- * - Confirmar exclusão
- * - Executar DELETE no backend
+ * Objetivo:
+ * - Buscar a categoria pelo id (GET /categoria/:id)
+ * - Exibir confirmação de exclusão
+ * - Deletar a categoria no backend (DELETE /categoria/:id)
  *
- * Suporta modo dev com VITE_SKIP_AUTH=true
+ * Suporte a modo dev:
+ * - Se VITE_SKIP_AUTH=true e não houver token:
+ *   - Mostra dados mock para a tela existir
+ *   - Simula a exclusão
+ *
+ * Padrão de rotas (singular):
+ * - Listagem: /categoria
+ * - Deletar:  /categoria/deletar/:id
  */
 function DeletarCategoria() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
+  // Estado da categoria selecionada para exclusão
   const [categoria, setCategoria] = useState<Categoria>({
     id: 0,
     nome: "",
     descricao: ""
   });
 
+  // Loading do botão confirmar
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // Auth
   const { usuario, handleLogout } = useContext(AuthContext);
   const token = usuario.token;
 
+  // Flag modo dev
   const skipAuth = String(import.meta.env.VITE_SKIP_AUTH) === "true";
 
+  // Evita toast duplicado no StrictMode
   const avisouRef = useRef(false);
 
   /**
-   * Proteção de rota
+   * Proteção de rota:
+   * - Quando NÃO estiver em modo dev, exige token
    */
   useEffect(() => {
     if (skipAuth) return;
@@ -50,11 +63,12 @@ function DeletarCategoria() {
   }, [token, navigate, skipAuth]);
 
   /**
-   * Busca categoria para confirmação
+   * Busca categoria para mostrar na confirmação
    */
   useEffect(() => {
     if (!id) return;
 
+    // Modo dev sem token: mock para tela existir
     if (skipAuth && !token) {
       setCategoria({
         id: Number(id),
@@ -82,11 +96,18 @@ function DeletarCategoria() {
     }
   }
 
+  /**
+   * Retorna para a listagem (singular)
+   */
   function retornar() {
-    navigate("/categorias");
+    navigate("/categoria");
   }
 
+  /**
+   * Confirma exclusão
+   */
   async function deletarCategoria() {
+    // Modo dev sem token: simula para a tela funcionar
     if (skipAuth && !token) {
       ToastAlerta("Exclusão simulada em modo desenvolvimento.", "info");
       retornar();
@@ -125,12 +146,11 @@ function DeletarCategoria() {
           {categoria.nome}
         </header>
 
-        <p className="p-6 bg-slate-200">
-          {categoria.descricao}
-        </p>
+        <p className="p-6 bg-slate-200">{categoria.descricao}</p>
 
         <div className="flex">
           <button
+            type="button"
             onClick={retornar}
             className="w-full bg-red-400 hover:bg-red-600 text-white py-2"
           >
@@ -138,7 +158,9 @@ function DeletarCategoria() {
           </button>
 
           <button
+            type="button"
             onClick={deletarCategoria}
+            disabled={isLoading}
             className="w-full bg-indigo-400 hover:bg-indigo-600 text-white flex justify-center items-center"
           >
             {isLoading ? <ClipLoader size={24} /> : "Sim"}

@@ -11,49 +11,50 @@ import { ClipLoader } from "react-spinners";
 
 import { AuthContext } from "../../../contexts/AuthContext";
 import type Categoria from "../../../models/Categoria";
-import {
-  atualizar,
-  buscar,
-  cadastrar,
-  authHeader
-} from "../../../services/Service";
+import { atualizar, buscar, cadastrar, authHeader } from "../../../services/Service";
 import { ToastAlerta } from "../../../utils/ToastAlerta";
 
 /**
  * FormCategoria
  *
- * Responsável por:
- * - Cadastrar nova categoria
- * - Editar categoria existente
+ * Objetivo:
+ * - Renderizar a tela de cadastro e edição de categoria
  *
- * Regras:
- * - Se existir id na rota, entra em modo edição
- * - Se não existir id, entra em modo cadastro
- * - Suporta VITE_SKIP_AUTH=true para testes visuais
+ * Regras de funcionamento:
+ * - Se existir id na rota, entra em modo edição (busca a categoria e atualiza)
+ * - Se não existir id, entra em modo cadastro (cria nova categoria)
+ *
+ * Suporte a modo dev:
+ * - Se VITE_SKIP_AUTH=true e não houver token, permite visualizar a tela
+ *   (e simula ações para não depender do backend)
  */
 function FormCategoria() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
+  // Estado do formulário
   const [categoria, setCategoria] = useState<Categoria>({
     id: 0,
     nome: "",
     descricao: ""
   });
 
+  // Loading do botão salvar
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // Auth
   const { usuario, handleLogout } = useContext(AuthContext);
   const token = usuario.token;
 
-  // Flag de modo dev
+  // Flag de modo dev (sem exigir login)
   const skipAuth = String(import.meta.env.VITE_SKIP_AUTH) === "true";
 
   // Evita toast duplicado no StrictMode
   const avisouRef = useRef(false);
 
   /**
-   * Proteção de rota
+   * Proteção de rota:
+   * - Se não estiver em modo dev e não tiver token, bloqueia
    */
   useEffect(() => {
     if (skipAuth) return;
@@ -66,13 +67,14 @@ function FormCategoria() {
   }, [token, navigate, skipAuth]);
 
   /**
-   * Se existir id, busca a categoria para edição
+   * Modo edição:
+   * - Se existir id, buscamos a categoria para preencher o formulário
    */
   useEffect(() => {
     if (!id) return;
 
+    // Modo dev sem token: mock para ver a tela
     if (skipAuth && !token) {
-      // Mock para visualização da tela em modo dev
       setCategoria({
         id: Number(id),
         nome: "Categoria Mock",
@@ -100,7 +102,9 @@ function FormCategoria() {
   }
 
   /**
-   * Atualiza estado conforme digitação
+   * Atualiza o estado conforme digitação
+   * Observação:
+   * - O name do input deve bater com o campo do objeto (nome, descricao)
    */
   function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
     setCategoria({
@@ -109,17 +113,22 @@ function FormCategoria() {
     });
   }
 
+  /**
+   * Retorna para a listagem (singular)
+   */
   function retornar() {
-    navigate("/categorias");
+    navigate("/categoria");
   }
 
   /**
-   * Salvar categoria (POST ou PUT)
+   * Salvar categoria:
+   * - Se existir id, faz PUT
+   * - Senão, faz POST
    */
   async function salvarCategoria(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // Em modo dev sem auth, apenas simula
+    // Modo dev sem token: simula e volta
     if (skipAuth && !token) {
       ToastAlerta("Ação simulada em modo desenvolvimento.", "info");
       retornar();

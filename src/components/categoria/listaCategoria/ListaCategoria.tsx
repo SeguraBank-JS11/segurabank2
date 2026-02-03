@@ -1,6 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
+import { Plus } from "lucide-react";
 
 import { AuthContext } from "../../../contexts/AuthContext";
 import type Categoria from "../../../models/Categoria";
@@ -12,66 +13,83 @@ import { ToastAlerta } from "../../../utils/ToastAlerta";
  * ListaCategorias
  *
  * Objetivo:
- * - Listar categorias consumindo o endpoint do Swagger: GET /categoria
+ * - Exibir a listagem de categorias do sistema
+ * - Consumir o endpoint GET /categoria
  *
  * Regras de autenticação:
- * - Se VITE_SKIP_AUTH=true: modo dev (permite ver a tela sem login)
- *   - Ainda assim, o backend pode responder 401
- *   - Nesse caso, usamos um MOCK local para visualizar a UI
- * - Se VITE_SKIP_AUTH=false: exige token e protege a rota
+ * - Se VITE_SKIP_AUTH=true:
+ *   - Permite visualizar a tela sem login (modo desenvolvimento)
+ *   - Caso a API retorne 401, utiliza MOCK local apenas para UI
+ *
+ * - Se VITE_SKIP_AUTH=false:
+ *   - Exige token válido
+ *   - Protege a rota e redireciona para "/" se não autenticado
  *
  * Observação sobre React 18:
- * - Em dev com StrictMode, efeitos rodam 2x.
- *   Usamos refs para evitar toasts duplicados e chamadas repetidas.
+ * - Em dev com StrictMode, effects rodam 2x.
+ * - Usamos refs para evitar chamadas duplicadas e múltiplos toasts.
  */
 function ListaCategorias() {
   const navigate = useNavigate();
 
-  // Estado de loading
+  /**
+   * Estado de loading para controle do spinner
+   */
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Lista de categorias vinda da API (ou mock)
+  /**
+   * Estado que armazena a lista de categorias
+   */
   const [categorias, setCategorias] = useState<Categoria[]>([]);
 
-  // AuthContext: usuário + logout
+  /**
+   * Contexto de autenticação
+   */
   const { usuario, handleLogout } = useContext(AuthContext);
   const token = usuario.token;
 
   /**
-   * Flag para modo dev sem autenticação
-   * No .env:
+   * Flag de ambiente para desenvolvimento sem autenticação
+   * Definida no arquivo .env:
    * VITE_SKIP_AUTH=true
    */
   const skipAuth = String(import.meta.env.VITE_SKIP_AUTH) === "true";
 
   /**
-   * Refs para evitar duplicidade em dev (StrictMode)
+   * Refs para evitar efeitos duplicados em dev (StrictMode)
    */
   const avisouSemTokenRef = useRef(false);
   const fezFetchRef = useRef(false);
 
   /**
-   * Mock local para visualizar UI quando não existe login pronto
-   * ou quando o backend exige auth e retorna 401.
+   * MOCK local de categorias
+   *
+   * Utilizado apenas quando:
+   * - skipAuth=true
+   * - backend exige autenticação e retorna 401
+   *
+   * Serve exclusivamente para visualização da UI.
    */
   const MOCK_CATEGORIAS: Categoria[] = [
     {
       id: 1,
       nome: "Seguro Vida",
       descricao: "Planos de seguro de vida e proteção familiar",
-      apolice: []
+      apolice: [],
     },
     {
       id: 2,
       nome: "Categoria Teste",
       descricao: "Teste de integração",
-      apolice: []
-    }
+      apolice: [],
+    },
   ];
 
   /**
-   * 1) Proteção de rota (apenas quando skipAuth=false)
-   * Se não tiver token, avisa e volta para "/"
+   * 1) Proteção de rota
+   *
+   * Executa apenas quando skipAuth=false.
+   * Caso não exista token, exibe alerta e redireciona.
    */
   useEffect(() => {
     if (skipAuth) return;
@@ -85,30 +103,25 @@ function ListaCategorias() {
 
   /**
    * 2) Buscar categorias
-   * - skipAuth=true: tenta buscar mesmo assim (para quem quer testar)
-   * - skipAuth=false: só busca se tiver token
    *
-   * Observação:
-   * O backend do SeguraBank protege GET /categoria com Bearer,
-   * então em skipAuth=true a API provavelmente vai responder 401.
-   * Por isso temos fallback para MOCK.
+   * Estratégia:
+   * - Evita chamadas duplicadas em StrictMode
+   * - Em skipAuth=true sem token, exibe mock
+   * - Caso contrário, tenta buscar da API
    */
   useEffect(() => {
-    // Evita double fetch no StrictMode em dev
     if (fezFetchRef.current) return;
 
-    // Se está sem auth e sem token, não tenta buscar na API (vai dar 401)
-    // e já mostra mock para visualizar UI.
+    // Modo dev sem autenticação: exibe mock direto
     if (skipAuth && !token) {
       fezFetchRef.current = true;
       setCategorias(MOCK_CATEGORIAS);
       return;
     }
 
-    // Se não está em skipAuth, precisa de token para buscar
+    // Produção: exige token
     if (!skipAuth && !token) return;
 
-    // Se chegou aqui, pode tentar buscar
     fezFetchRef.current = true;
     buscarCategorias();
 
@@ -116,7 +129,7 @@ function ListaCategorias() {
   }, [token, skipAuth]);
 
   /**
-   * Função que busca categorias no backend.
+   * Função responsável por buscar categorias no backend
    */
   async function buscarCategorias() {
     try {
@@ -124,8 +137,8 @@ function ListaCategorias() {
 
       /**
        * Header:
-       * - Se tiver token, usamos Bearer
-       * - Se skipAuth=true e token vazio, header será {}
+       * - Com token: Authorization Bearer
+       * - Sem token (skipAuth): objeto vazio
        */
       const header = token ? authHeader(token) : {};
 
@@ -134,9 +147,7 @@ function ListaCategorias() {
       const msg = error?.toString?.() ?? "";
 
       /**
-       * Caso 401:
-       * - skipAuth=false: logout e volta para home
-       * - skipAuth=true: fallback para mock e não trava sua vida
+       * Tratamento de erro 401
        */
       if (msg.includes("401")) {
         if (!skipAuth) {
@@ -145,15 +156,14 @@ function ListaCategorias() {
           navigate("/");
         } else {
           ToastAlerta(
-            "API pediu login (401). Mostrando mock só para visualizar a tela.",
-            "info"
+            "API pediu login (401). Mostrando mock apenas para visualização.",
+            "info",
           );
           setCategorias(MOCK_CATEGORIAS);
         }
         return;
       }
 
-      // Erro genérico
       ToastAlerta("Erro ao listar categorias.", "erro");
     } finally {
       setIsLoading(false);
@@ -162,16 +172,41 @@ function ListaCategorias() {
 
   return (
     <>
-      {/* Loader */}
+      {/* Loader de carregamento */}
       {isLoading && (
         <div className="flex justify-center w-full my-8">
-          <SyncLoader size={32} />
+          <SyncLoader color="#1E3A8A" size={32} />
         </div>
       )}
 
-      {/* Conteúdo */}
+      {/* Conteúdo principal */}
       <div className="flex justify-center w-full my-4">
         <div className="container flex flex-col">
+          {/* Header da página de Categorias + CTA */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between my-8">
+            <div className="space-y-2">
+              <span className="inline-block bg-blue-100 text-bank-blue px-4 py-1 rounded-full text-sm font-semibold">
+                Gestão
+              </span>
+              <h1 className="text-3xl font-bold text-gray-900">Categoria</h1>
+              <p className="text-gray-600">
+                Crie e gerencie as categorias do SeguraBank.
+              </p>
+            </div>
+
+            {/* Botão Criar Categoria */}
+            <button
+              type="button"
+              onClick={() => navigate("/categoria/cadastrar")}
+              className="inline-flex items-center justify-center gap-2
+                         bg-bank-blue text-white px-6 py-3 rounded-xl
+                         font-semibold hover:bg-blue-800 transition"
+            >
+              <Plus size={18} />
+              Criar Categoria
+            </button>
+          </div>
+
           {/* Estado vazio */}
           {!isLoading && categorias.length === 0 && (
             <span className="text-3xl text-center my-8">
