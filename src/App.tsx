@@ -1,48 +1,80 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/navbar/Navbar';
-import Footer from './components/footer/Footer';
-import Home from './pages/home/Home';
-import About from './pages/sobre/About';
-import Produtos from './components/produto/listaproduto/ListaProduto';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import 'react-toastify/dist/ReactToastify.css'
-import ListaProdutos from './components/produto/listaproduto/ListaProduto';
-import { AuthProvider } from './contexts/AuthContext';
-import { ToastContainer } from 'react-toastify';
+// Componentes fixos de layout
+import Navbar from "./components/navbar/Navbar";
+import Footer from "./components/footer/Footer";
+
+// Páginas
+import Home from "./pages/home/Home";
+import About from "./pages/sobre/About";
+
+// Categoria (TASK ATUAL)
+import ListaCategorias from "./components/categoria/listaCategoria/ListaCategoria";
+import FormCategoria from "./components/categoria/formcategoria/FormCategoria";
+import DeletarCategoria from "./components/categoria/deletarcategoria/DeletarCategoria";
+
+// Produto (já existente no projeto)
+import ListaProdutos from "./components/produto/listaproduto/ListaProduto";
+
+// Contexto de autenticação
+import { AuthProvider } from "./contexts/AuthContext";
+
+// Toast
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-	return (
-		<>
-			<AuthProvider>
-				<ToastContainer />
-				<Router>
-					<div className="flex flex-col min-h-screen">
-					<Navbar />
-						 {/* Área de conteúdo que muda conforme a rota */}
-						<main className="grow">
-						<Routes>
-							
-							<Route path="/home" element={<Home />} />
-							<Route path="/sobre" element={<About />} />
-							{/* <Route path="/login" element={<Login />} />
-							<Route path="/cadastro"	element={<Cadastro />}/>
-							<Route path="/categorias" element={<ListaCategorias />} />
-							<Route path="/cadastrarcategoria" element={<FormCategoria />} />
-							<Route path="/editarcategoria/:id" element={<FormCategoria />} />
-							<Route path="/deletarcategoria/:id" element={<DeletarCategoria />} /> */}
-							<Route path="/produtos" element={<ListaProdutos />} />
-							{/* <Route path="/cadastrarproduto" element={<FormProduto />} />
-							<Route path="/editarproduto/:id" element={<FormProduto />} />
-							<Route path="/deletarproduto/:id" element={<DeletarProduto />} />
-							<Route path="/perfil" element={<Perfil />} /> */}
-						</Routes>
-						</main>
-					<Footer />
-					</div>
-				</Router>
-			</AuthProvider>
-		</>
-	)
+  return (
+    <>
+      {/* Contexto global de autenticação */}
+      <AuthProvider>
+        {/* Container global de alertas */}
+        <ToastContainer />
+
+        <Router>
+          <div className="flex flex-col min-h-screen">
+            {/* Menu fixo */}
+            <Navbar />
+
+            {/* Conteúdo que muda conforme a rota */}
+            <main className="grow">
+              <Routes>
+                {/* Rotas públicas */}
+                <Route path="/" element={<Home />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/sobre" element={<About />} />
+
+                {/* ========================= */}
+                {/* ROTAS DE CATEGORIA (SINGULAR) */}
+                {/* ========================= */}
+                <Route path="/categoria" element={<ListaCategorias />} />
+                <Route
+                  path="/categoria/cadastrar"
+                  element={<FormCategoria />}
+                />
+                <Route
+                  path="/categoria/editar/:id"
+                  element={<FormCategoria />}
+                />
+                <Route
+                  path="/categoria/deletar/:id"
+                  element={<DeletarCategoria />}
+                />
+
+                {/* ========================= */}
+                {/* ROTAS DE PRODUTO */}
+                {/* ========================= */}
+                <Route path="/produtos" element={<ListaProdutos />} />
+              </Routes>
+            </main>
+
+            {/* Rodapé fixo */}
+            <Footer />
+          </div>
+        </Router>
+      </AuthProvider>
+    </>
+  );
 }
 
-export default App
+export default App;
