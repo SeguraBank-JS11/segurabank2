@@ -17,44 +17,42 @@ import { ToastAlerta } from "../../../utils/ToastAlerta";
 /**
  * FormCategoria
  *
- * Objetivo:
- * - Renderizar a tela de cadastro e edição de categoria
+ * Responsável por:
+ * - Cadastrar nova categoria
+ * - Editar categoria existente
  *
- * Regras de funcionamento:
- * - Se existir id na rota, entra em modo edição (busca a categoria e atualiza)
- * - Se não existir id, entra em modo cadastro (cria nova categoria)
+ * Regras:
+ * - Se existir id na rota, entra em modo edição
+ * - Se não existir id, entra em modo cadastro
+ * - Suporta VITE_SKIP_AUTH=true para testes visuais
  *
- * Suporte a modo dev:
- * - Se VITE_SKIP_AUTH=true e não houver token, permite visualizar a tela
- *   (e simula ações para não depender do backend)
+ * Diretriz visual:
+ * - Manter o padrão do Home:
+ *   - fundo leve em degradê
+ *   - card branco com borda suave
+ *   - CTA bank-blue com hover
  */
 function FormCategoria() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  // Estado do formulário
   const [categoria, setCategoria] = useState<Categoria>({
     id: 0,
     nome: "",
     descricao: ""
   });
 
-  // Loading do botão salvar
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Auth
   const { usuario, handleLogout } = useContext(AuthContext);
   const token = usuario.token;
 
-  // Flag de modo dev (sem exigir login)
   const skipAuth = String(import.meta.env.VITE_SKIP_AUTH) === "true";
 
-  // Evita toast duplicado no StrictMode
   const avisouRef = useRef(false);
 
   /**
-   * Proteção de rota:
-   * - Se não estiver em modo dev e não tiver token, bloqueia
+   * Proteção de rota
    */
   useEffect(() => {
     if (skipAuth) return;
@@ -67,13 +65,11 @@ function FormCategoria() {
   }, [token, navigate, skipAuth]);
 
   /**
-   * Modo edição:
-   * - Se existir id, buscamos a categoria para preencher o formulário
+   * Se existir id, busca a categoria para edição
    */
   useEffect(() => {
     if (!id) return;
 
-    // Modo dev sem token: mock para ver a tela
     if (skipAuth && !token) {
       setCategoria({
         id: Number(id),
@@ -102,9 +98,7 @@ function FormCategoria() {
   }
 
   /**
-   * Atualiza o estado conforme digitação
-   * Observação:
-   * - O name do input deve bater com o campo do objeto (nome, descricao)
+   * Atualiza estado conforme digitação
    */
   function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
     setCategoria({
@@ -114,21 +108,18 @@ function FormCategoria() {
   }
 
   /**
-   * Retorna para a listagem (singular)
+   * Retorna para a listagem (rota no singular)
    */
   function retornar() {
     navigate("/categoria");
   }
 
   /**
-   * Salvar categoria:
-   * - Se existir id, faz PUT
-   * - Senão, faz POST
+   * Salvar categoria (POST ou PUT)
    */
   async function salvarCategoria(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // Modo dev sem token: simula e volta
     if (skipAuth && !token) {
       ToastAlerta("Ação simulada em modo desenvolvimento.", "info");
       retornar();
@@ -161,46 +152,80 @@ function FormCategoria() {
   }
 
   return (
-    <div className="container flex flex-col items-center justify-center mx-auto">
-      <h1 className="text-4xl text-center my-8">
-        {id ? "Editar Categoria" : "Cadastrar Categoria"}
-      </h1>
+    <div className="flex flex-col min-h-screen">
+      {/* Fundo padrão do Home */}
+      <section className="bg-linear-to-br from-gray-50 to-blue-50 py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Cabeçalho */}
+          <div className="mb-10">
+            <span className="inline-block bg-blue-100 text-bank-blue px-4 py-1 rounded-full text-sm font-semibold">
+              Gestão
+            </span>
 
-      <form className="w-1/2 flex flex-col gap-4" onSubmit={salvarCategoria}>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="nome">Nome</label>
-          <input
-            id="nome"
-            type="text"
-            name="nome"
-            value={categoria.nome}
-            onChange={atualizarEstado}
-            className="border-2 border-slate-700 rounded p-2"
-            placeholder="Digite o nome da categoria"
-          />
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mt-3">
+              {id ? "Editar Categoria" : "Cadastrar Categoria"}
+            </h1>
+
+            <p className="text-gray-600 mt-2">
+              Preencha os dados abaixo para {id ? "atualizar" : "criar"} uma categoria.
+            </p>
+          </div>
+
+          {/* Card do formulário */}
+          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-8 md:p-10 max-w-2xl">
+            <form className="flex flex-col gap-5" onSubmit={salvarCategoria}>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="nome" className="text-sm font-semibold text-gray-800">
+                  Nome
+                </label>
+                <input
+                  id="nome"
+                  type="text"
+                  name="nome"
+                  value={categoria.nome}
+                  onChange={atualizarEstado}
+                  className="border border-gray-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  placeholder="Digite o nome da categoria"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="descricao" className="text-sm font-semibold text-gray-800">
+                  Descrição
+                </label>
+                <input
+                  id="descricao"
+                  type="text"
+                  name="descricao"
+                  value={categoria.descricao}
+                  onChange={atualizarEstado}
+                  className="border border-gray-200 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  placeholder="Digite a descrição"
+                />
+              </div>
+
+              {/* Ações */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-bank-blue text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-800 transition flex items-center justify-center"
+                >
+                  {isLoading ? <ClipLoader size={20} color="#ffffff" /> : id ? "Atualizar" : "Cadastrar"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={retornar}
+                  className="bg-white text-bank-blue border border-gray-200 px-8 py-3 rounded-xl font-semibold hover:bg-gray-50 transition"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-
-        <div className="flex flex-col gap-2">
-          <label htmlFor="descricao">Descrição</label>
-          <input
-            id="descricao"
-            type="text"
-            name="descricao"
-            value={categoria.descricao}
-            onChange={atualizarEstado}
-            className="border-2 border-slate-700 rounded p-2"
-            placeholder="Digite a descrição"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="rounded text-slate-100 bg-indigo-400 hover:bg-indigo-800 w-1/2 py-2 mx-auto flex justify-center"
-        >
-          {isLoading ? <ClipLoader size={24} /> : id ? "Atualizar" : "Cadastrar"}
-        </button>
-      </form>
+      </section>
     </div>
   );
 }

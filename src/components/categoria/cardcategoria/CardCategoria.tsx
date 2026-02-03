@@ -1,21 +1,18 @@
 import { Link } from "react-router-dom";
+import { Pencil, Trash2 } from "lucide-react";
 import type Categoria from "../../../models/Categoria";
 
 /**
  * CardCategoria
  *
- * Objetivo:
- * - Exibir uma categoria (nome e descrição)
- * - Exibir ações de navegação para:
- *   - Editar
- *   - Deletar
+ * Responsável por exibir:
+ * - Nome da categoria
+ * - Descrição
+ * - Ações: Editar e Deletar
  *
- * Padrão de rotas do projeto (singular), conforme App.tsx:
- * - /categoria/editar/:id
- * - /categoria/deletar/:id
- *
- * Observação:
- * - O Link pode ser estilizado como botão, então não precisamos de <button> dentro dele.
+ * Diretriz visual:
+ * - Card claro, borda suave, sombra leve
+ * - Botões consistentes com a paleta do projeto
  */
 interface CardCategoriaProps {
   categoria: Categoria;
@@ -23,39 +20,38 @@ interface CardCategoriaProps {
 
 function CardCategoria({ categoria }: CardCategoriaProps) {
   return (
-    <article className="border flex flex-col rounded-2xl overflow-hidden justify-between shadow-sm">
-      {/* Cabeçalho do card: nome da categoria */}
-      <header className="py-2 px-6 bg-indigo-800 text-white font-bold text-2xl">
-        {categoria.nome}
-      </header>
+    <article className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition">
+      {/* Conteúdo */}
+      <div className="p-7">
+        <h3 className="text-xl font-bold text-gray-900">{categoria.nome}</h3>
 
-      {/* Corpo do card: descrição da categoria */}
-      <div className="p-8 text-lg bg-slate-200 h-full">
-        <p>{categoria.descricao}</p>
+        <p className="text-gray-600 mt-3 leading-relaxed">
+          {categoria.descricao}
+        </p>
       </div>
 
-      {/* Rodapé do card: botões/ações */}
-      <footer className="flex">
-        {/* Editar: leva para /categoria/editar/:id */}
+      {/* Ações */}
+      <div className="border-t border-gray-100 grid grid-cols-2">
         <Link
           to={`/categoria/editar/${categoria.id}`}
-          className="w-1/2 text-slate-100 bg-indigo-400 hover:bg-indigo-800 flex items-center justify-center py-2 font-semibold transition-colors"
+          className="flex items-center justify-center gap-2 py-3 font-semibold text-bank-blue hover:bg-blue-50 transition"
           aria-label={`Editar categoria ${categoria.nome}`}
           title="Editar"
         >
+          <Pencil size={16} />
           Editar
         </Link>
 
-        {/* Deletar: leva para /categoria/deletar/:id */}
         <Link
           to={`/categoria/deletar/${categoria.id}`}
-          className="w-1/2 text-slate-100 bg-red-400 hover:bg-red-700 flex items-center justify-center py-2 font-semibold transition-colors"
+          className="flex items-center justify-center gap-2 py-3 font-semibold text-red-600 hover:bg-red-50 transition border-l border-gray-100"
           aria-label={`Deletar categoria ${categoria.nome}`}
           title="Deletar"
         >
+          <Trash2 size={16} />
           Deletar
         </Link>
-      </footer>
+      </div>
     </article>
   );
 }

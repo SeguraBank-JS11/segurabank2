@@ -26,8 +26,9 @@ const Navbar = () => {
               Home
             </Link>
 
+            {/* Rota no singular conforme padrão do projeto */}
             <Link
-              to="/categorias"
+              to="/categoria"
               className="text-gray-600 hover:text-bank-blue font-medium transition-colors"
             >
               Categorias
@@ -39,6 +40,7 @@ const Navbar = () => {
             >
               Produtos
             </Link>
+
             <Link
               to="/sobre"
               className="text-gray-600 hover:text-bank-blue font-medium transition-colors"
@@ -55,7 +57,6 @@ const Navbar = () => {
             <div className="h-10 w-10 bg-bank-blue rounded-full flex items-center justify-center text-white cursor-pointer">
               <User size={20} />
             </div>
-            {/* Menu Mobile (Hamburguer) */}
             <button className="md:hidden p-2 text-gray-500">
               <Menu size={24} />
             </button>
